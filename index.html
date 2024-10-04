@@ -3,109 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual Schedule App</title>
+    <title>Visual Schedule with IEP Logging</title>
     <style>
         body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
+            background-color: #f0f0f0;
+            overflow-y: auto;
         }
-        .image-grid {
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+        label {
+            margin-top: 10px;
+            font-size: 1em;
+        }
+        select, textarea, button {
+            width: 100%;
+            font-size: 1em;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+            border: none;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #image-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+            width: 100%;
         }
         img {
-            width: 100px;
-            height: 100px;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        img:hover {
-            transform: scale(1.1);
-        }
-        .fullscreen {
             width: 100%;
-            height: 100%;
+            height: auto;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        .full-screen {
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 10;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            background-color: white;
+            z-index: 1000;
         }
-        .fullscreen img {
-            width: 300px;
-            height: 300px;
-        }
-        .retry {
+        #retry {
             display: none;
+        }
+        #reset-button, #export-log, #save-session, #clear-log {
+            width: 100%;
+        }
+        #session-log {
+            margin-top: 20px;
+            width: 100%;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #fff;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .session-entry {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
         }
     </style>
 </head>
 <body>
 
-<h1>Select the Correct Activity</h1>
+    <div class="container">
+        <h1>Hi Inara!
+    <br> What are we doing next?</h1>
 
-<div class="image-grid">
-    <img src="lifeskills.png" alt="Lifeskills" id="lifeskills">
-    <img src="math.png" alt="Math" id="math">
-    <img src="english.png" alt="English" id="english">
-    <img src="science.png" alt="Science" id="science">
-    <img src="health.png" alt="Health" id="health">
-    <img src="physed.png" alt="Phys Ed" id="physed">
-</div>
+        <label for="activity-select">Choose the correct activity:</label>
+        <select id="activity-select">
+        <option value="lifeskills">Lifeskills</option>
+		<option value="math">Math</option>
+		<option value="english">English</option>
+		<option value="science">Science</option>
+		<option value="health">Health</option>
+		<option value="physed">Phys Ed</option>
+    </select>
 
-<div id="retry" class="retry">
-    <p>Incorrect! Try again.</p>
-    <img src="retry.png" alt="Retry" id="retryImg" style="width: 100px; height: 100px;">
-</div>
+        <label for="goal-select">Select Annual Goal:</label>
+        <select id="goal-select">
+            <option value="goal1">Annual Goal #1</option>
+            <option value="goal2">Annual Goal #2</option>
+        </select>
 
-<div id="fullscreen" class="fullscreen" style="display: none;">
-    <img src="" alt="Full Screen Image" id="fullscreenImg">
-</div>
+        <label for="independence-select">Did the student act independently?</label>
+        <select id="independence-select">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select>
 
-<label for="correctImage">Select Correct Image:</label>
-<select id="correctImage">
-    <option value="lifeskills">Lifeskills</option>
-    <option value="math">Math</option>
-    <option value="english">English</option>
-    <option value="science">Science</option>
-    <option value="health">Health</option>
-    <option value="physed">Phys Ed</option>
-</select>
+        <label for="comments">Comments:</label>
+        <textarea id="comments" placeholder="Add any notes or comments..."></textarea>
 
-<script>
-    const images = document.querySelectorAll('img');
-    const retryDiv = document.getElementById('retry');
-    const retryImg = document.getElementById('retryImg');
-    const fullscreenDiv = document.getElementById('fullscreen');
-    const fullscreenImg = document.getElementById('fullscreenImg');
-    const correctImage = document.getElementById('correctImage');
+        <button id="save-session" onclick="saveSession()">Save Session</button>
 
-    images.forEach(image => {
-        image.addEventListener('click', () => {
-            const selectedImage = image.id;
-            const correctSelection = correctImage.value;
+        <div id="image-container">
+        <img src="lifeskills.png" alt="Lifeskills" id="lifeskills">
+		<img src="math.png" alt="Math" id="math">
+		<img src="english.png" alt="English" id="english">
+		<img src="science.png" alt="Science" id="science">
+		<img src="health.png" alt="Health" id="health">
+		<img src="physed.png" alt="Phys Ed" id="physed">
+    </div>
 
-            if (selectedImage === correctSelection) {
-                fullscreenImg.src = image.src;
-                fullscreenDiv.style.display = 'flex';
-                retryDiv.style.display = 'none';
-            } else {
-                retryDiv.style.display = 'block';
-                retryImg.src = 'retry.png';
-            }
+        <div id="session-log">
+            <h2>Session Log</h2>
+            <div id="log-entries"></div>
+        </div>
+
+        <img id="retry" src="retry.png" alt="Try Again" class="full-screen">
+
+        <button id="reset-button" onclick="resetApp()" style="display:none;">Try Again</button>
+        <button id="export-log" onclick="exportLog()">Export All Sessions</button>
+        <button id="clear-log" onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script>
+        const images = document.querySelectorAll('#image-container img');
+        const retryImg = document.getElementById('retry');
+        const resetButton = document.getElementById('reset-button');
+        const correctActivity = document.getElementById('activity-select');
+        const goalSelect = document.getElementById('goal-select');
+        const independenceSelect = document.getElementById('independence-select');
+        const commentsField = document.getElementById('comments');
+        const logEntries = document.getElementById('log-entries');
+        const log = [];
+        let fullScreenImage = null;
+
+        images.forEach(image => {
+            image.addEventListener('click', function() {
+                checkSelection(this.id);
+            });
         });
-    });
 
-    fullscreenDiv.addEventListener('click', () => {
-        fullscreenDiv.style.display = 'none';
-    });
-</script>
+        function checkSelection(selectedId) {
+            const correctId = correctActivity.value;
+            const independence = independenceSelect.value;
+            const goal = goalSelect.value;
+            const comments = commentsField.value.trim();
+            const logEntry = {
+                time: new Date().toLocaleString(),
+                selectedActivity: selectedId,
+                correctActivity: correctId,
+                independence: independence,
+                goal: goal,
+                comments: comments,
+                result: selectedId === correctId ? 'Correct' : 'Incorrect'
+            };
+
+            log.push(logEntry);
+
+            if (selectedId === correctId) {
+                expandImage(document.getElementById(selectedId));
+            } else {
+                showRetryScreen();
+            }
+        }
+
+        function expandImage(image) {
+            fullScreenImage = image;
+            image.classList.add('full-screen');
+            image.addEventListener('click', resetApp); // Return to main screen by tapping the image
+        }
+
+        function showRetryScreen() {
+            retryImg.style.display = 'block';
+            retryImg.classList.add('full-screen');
+            retryImg.addEventListener('click', resetApp); // Return to main screen by tapping the retry image
+        }
+
+        function resetApp() {
+            if (fullScreenImage) {
+                fullScreenImage.classList.remove('full-screen');
+                fullScreenImage.removeEventListener('click', resetApp);
+            }
+            retryImg.style.display = 'none';
+            retryImg.classList.remove('full-screen');
+            retryImg.removeEventListener('click', resetApp);
+            resetButton.style.display = 'none';
+            fullScreenImage = null;
+        }
+
+        function saveSession() {
+            const correctId = correctActivity.value;
+            const goal = goalSelect.value;
+            const independence = independenceSelect.value;
+            const comments = commentsField.value.trim();
+
+            const logEntryHtml = `
+                <div class="session-entry">
+                    <strong>Time:</strong> ${new Date().toLocaleString()}<br>
+                    <strong>Selected Activity:</strong> ${correctId}<br>
+                    <strong>Goal:</strong> ${goal}<br>
+                    <strong>Independence:</strong> ${independence}<br>
+                    <strong>Comments:</strong> ${comments || 'None'}<br>
+                    <strong>Result:</strong> ${correctId === correctActivity.value ? 'Correct' : 'Incorrect'}
+                </div>
+            `;
+            logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
+            commentsField.value = ''; // Clear comments after saving
+        }
+
+        function exportLog() {
+            let logContent = "IEP Goal Tracking Log\n";
+            logContent += "Date and Time, Selected Activity, Correct Activity, Goal, Independence, Comments, Result\n";
+            log.forEach(entry => {
+                logContent += `${entry.time}, ${entry.selectedActivity}, ${entry.correctActivity}, ${entry.goal}, ${entry.independence}, ${entry.comments || 'None'}, ${entry.result}\n`;
+            });
+
+            const now = new Date();
+            const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+            const blob = new Blob([logContent], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `IEP_Goal_Tracking_Log_${dateString}.txt`;
+            link.click();
+      }
+
+        function clearLog() {
+            logEntries.innerHTML = '';
+            log.length = 0; // Clear the array
+        }
+    </script>
 
 </body>
 </html>
