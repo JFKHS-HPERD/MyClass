@@ -105,6 +105,13 @@
         <h1>Hi Inara!
     <br> What class are you in now?</h1>
 
+	<!-- Question Selection Dropdown -->
+        <label for="question-select">Select Question:</label>
+        <select id="question-select">
+            <option value="current">What class are you in now?</option>
+            <option value="next">What class do you have next?</option>
+        </select>    
+	    
         <label for="activity-select">Choose the correct activity:</label>
         <select id="activity-select">
         <option value="lifeskills">Lifeskills</option>
@@ -144,6 +151,27 @@
 		<img src="bus.png" alt="Bus" id="bus">
     </div>
 
+	<!-- Audio Elements for "I am in [subject]" -->
+        <audio id="in_lifeskills" src="in_lifeskills.mp3"></audio>
+        <audio id="in_math" src="in_math.mp3"></audio>
+        <audio id="in_english" src="in_english.mp3"></audio>
+        <audio id="in_science" src="in_science.mp3"></audio>
+        <audio id="in_physed" src="in_physed.mp3"></audio>
+        <audio id="in_health" src="in_health.mp3"></audio>
+        <audio id="in_bus" src="in_bus.mp3"></audio>
+
+        <!-- Audio Elements for "My next class is [subject]" -->
+        <audio id="next_lifeskills" src="next_lifeskills.mp3"></audio>
+        <audio id="next_math" src="next_math.mp3"></audio>
+        <audio id="next_english" src="next_english.mp3"></audio>
+        <audio id="next_science" src="next_science.mp3"></audio>
+        <audio id="next_physed" src="next_physed.mp3"></audio>
+        <audio id="next_health" src="next_health.mp3"></audio>
+        <audio id="next_bus" src="next_bus.mp3"></audio>
+
+        <!-- Audio Elements for "Try again" -->
+        <audio id="retry" src="retry.mp3"></audio>
+	    
         <div id="session-log">
             <h2>Session Log</h2>
             <div id="log-entries"></div>
@@ -161,12 +189,44 @@
         const retryImg = document.getElementById('retry');
         const resetButton = document.getElementById('reset-button');
         const correctActivity = document.getElementById('activity-select');
+        const questionSelect = document.getElementById('question-select');
         const goalSelect = document.getElementById('goal-select');
         const independenceSelect = document.getElementById('independence-select');
         const commentsField = document.getElementById('comments');
         const logEntries = document.getElementById('log-entries');
         const log = [];
         let fullScreenImage = null;
+        const audioElements = {
+            lifeskills: {
+                current: document.getElementById('in_lifeskills'),
+                next: document.getElementById('next_lifeskills')
+            },
+            math: {
+                current: document.getElementById('in_math'),
+                next: document.getElementById('next_math')
+            },
+            english: {
+                current: document.getElementById('in_english'),
+                next: document.getElementById('next_english')
+            },
+            science: {
+                current: document.getElementById('in_science'),
+                next: document.getElementById('next_science')
+            },
+            physed: {
+                current: document.getElementById('in_physed'),
+                next: document.getElementById('next_physed')
+            },
+            health: {
+                current: document.getElementById('in_health'),
+                next: document.getElementById('next_health')
+            },
+            bus: {
+                current: document.getElementById('in_bus'),
+                next: document.getElementById('next_bus')
+            },
+            tryAgain: document.getElementById('try_again')
+        };
 
         images.forEach(image => {
             image.addEventListener('click', function() {
@@ -174,11 +234,13 @@
             });
         });
 
-        function checkSelection(selectedId) {
+                function checkSelection(selectedId) {
             const correctId = correctActivity.value;
+            const selectedQuestion = questionSelect.value;
             const independence = independenceSelect.value;
             const goal = goalSelect.value;
             const comments = commentsField.value.trim();
+            
             const logEntry = {
                 time: new Date().toLocaleString(),
                 selectedActivity: selectedId,
@@ -192,9 +254,26 @@
             log.push(logEntry);
 
             if (selectedId === correctId) {
+                playAudio(selectedId, selectedQuestion); // Play the correct audio
                 expandImage(document.getElementById(selectedId));
             } else {
+                playAudio('tryAgain'); // Play "Try again" audio
                 showRetryScreen();
+            }
+        }
+
+
+        function playAudio(activity, questionType) {
+            // Pause all audio elements before playing the correct one
+            Object.values(audioElements).forEach(item => {
+                Object.values(item).forEach(audio => audio.pause());
+            });
+
+            if (activity === 'tryAgain') {
+                audioElements.tryAgain.play();
+            } else {
+                // Play the correct audio based on the question type (current/next)
+                audioElements[activity][questionType].play();
             }
         }
 
