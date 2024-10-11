@@ -7,354 +7,187 @@
     <style>
         body {
             margin: 0;
-            padding: 0;
+            padding: 10px;
             box-sizing: border-box;
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            overflow-y: auto;
+            color: #333;
         }
         .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 10px;
             max-width: 600px;
             margin: 0 auto;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h1, h2 {
             text-align: center;
-            font-size: 1.5em;
-            margin: 20px 0;
+            color: #0892fc;
         }
-        label {
-            margin-top: 10px;
-            font-size: 1em;
-        }
-        select, textarea, button {
+        label, button, select, textarea {
+            display: block;
             width: 100%;
-            font-size: 1em;
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        textarea {
-            height: 100px;
-            resize: none;
+            margin: 10px 0;
         }
         button {
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-            margin-top: 15px;
+            background-color: #0892fc;
+            color: #fff;
+            padding: 10px;
             border: none;
+            cursor: pointer;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #0775d1;
         }
-        #image-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin: 20px 0;
+        textarea {
+            resize: none;
+            padding: 10px;
+        }
+        table {
             width: 100%;
-        }
-        img {
-            width: 100%;
-            height: auto;
-            cursor: pointer;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-        }
-        .full-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            object-fit: contain;
-            background-color: white;
-            z-index: 1000;
-        }
-        #retry {
-            display: none;
-        }
-        #reset-button, #export-log, #save-session, #clear-log {
-            width: 100%;
-        }
-        #session-log {
+            border-collapse: collapse;
             margin-top: 20px;
-            width: 100%;
-            border: 1px solid #ccc;
-            padding: 10px;
-            background-color: #fff;
-            max-height: 300px;
-            overflow-y: auto;
         }
-        .session-entry {
-            margin-bottom: 10px;
+        th, td {
             padding: 10px;
-            border-bottom: 1px solid #ccc;
+            border: 1px solid #ccc;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Hello!
-    <br> "What class are you in now? and "What class do you have next?"</h1>
+<div class="container">
+    <h1>IEP Visual Schedule Log</h1>
 
-	    <label for="goal-select">(Teacher) Select objective for Annual Goal #1:</label>
-        <select id="goal-select">
-            <option value="goal1">Objective 1: What class are you in now?</option>
-            <option value="goal2">Objective 2: What class do you have next?"</option>
-        </select>
+    <label for="goal-select">Select IEP Goal:</label>
+    <select id="goal-select">
+        <option value="goal1">Annual Goal #1</option>
+        <option value="goal2">Annual Goal #2</option>
+    </select>
 
-	    <label for="activity-select">(Teacher) Choose the correct class:</label>
-        <select id="activity-select">
-            <option value="lifeskills">Lifeskills</option>
-            <option value="math">Math</option>
-            <option value="english">English</option>
-            <option value="science">Science</option>
-            <option value="physed">Phys Ed</option>
-            <option value="health">Health</option>
-            <option value="bus">Bus</option>
-        </select>
+    <label for="activity-select">Choose the correct activity:</label>
+    <select id="activity-select">
+        <option value="lifeskills">Lifeskills</option>
+        <option value="math">Math</option>
+        <option value="english">English</option>
+        <option value="science">Science</option>
+        <option value="physed">Phys Ed</option>
+        <option value="health">Health</option>
+        <option value="bus">Bus</option>
+    </select>
 
-	    <p>Have the student select from the icons below.</p>
-	    <hr>
+    <label for="independence-select">Did the student act independently?</label>
+    <select id="independence-select">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
 
-        <!-- Class Icons -->
-        <div id="image-container">
-            <img src="lifeskills.png" alt="Lifeskills" id="lifeskills">
-            <img src="math.png" alt="Math" id="math">
-            <img src="english.png" alt="English" id="english">
-            <img src="science.png" alt="Science" id="science">
-            <img src="physed.png" alt="Phys Ed" id="physed">
-            <img src="health.png" alt="Health" id="health">
-            <img src="bus.png" alt="Bus" id="bus">
-        </div>
+    <label for="comments">Comments:</label>
+    <textarea id="comments" placeholder="Enter any comments..."></textarea>
 
-        <!-- Audio Elements for "I am in [subject]" -->
-        <audio id="in_lifeskills" src="in_lifeskills.mp3"></audio>
-        <audio id="in_math" src="in_math.mp3"></audio>
-        <audio id="in_english" src="in_english.mp3"></audio>
-        <audio id="in_science" src="in_science.mp3"></audio>
-        <audio id="in_physed" src="in_physed.mp3"></audio>
-        <audio id="in_health" src="in_health.mp3"></audio>
-        <audio id="in_bus" src="in_bus.mp3"></audio>
+    <button id="save-session">Save Session</button>
 
-        <!-- Audio Elements for "My next class is [subject]" -->
-        <audio id="next_lifeskills" src="next_lifeskills.mp3"></audio>
-        <audio id="next_math" src="next_math.mp3"></audio>
-        <audio id="next_english" src="next_english.mp3"></audio>
-        <audio id="next_science" src="next_science.mp3"></audio>
-        <audio id="next_physed" src="next_physed.mp3"></audio>
-        <audio id="next_health" src="next_health.mp3"></audio>
-        <audio id="next_bus" src="next_bus.mp3"></audio>
+    <h2>Session Log</h2>
+    <table id="log-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Goal</th>
+                <th>Activity</th>
+                <th>Independence</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
-        <!-- Audio Elements for "Try again" -->
-        <audio id="retry" src="retry.mp3"></audio>
+    <button id="export-csv">Export to CSV</button>
+    <button id="export-txt">Export to TXT</button>
+    <button id="clear-log">Clear Log</button>
+</div>
 
-	    <hr>
+<script>
+    const logTableBody = document.querySelector('#log-table tbody');
+    let logEntries = JSON.parse(localStorage.getItem('logEntries')) || [];
 
-	    <label for="independence-select">(Teacher) Did the student act independently?</label>
-        <select id="independence-select">
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        </select>
+    // Add session data to the log
+    document.getElementById('save-session').addEventListener('click', function () {
+        const goal = document.getElementById('goal-select').value;
+        const activity = document.getElementById('activity-select').value;
+        const independence = document.getElementById('independence-select').value;
+        const comments = document.getElementById('comments').value.trim() || 'None';
 
-        <label for="comments">Teacher Comments:</label>
-        <textarea id="comments" placeholder="Add any notes or comments..."></textarea>
+        const now = new Date();
+        const date = now.toLocaleDateString();
+        const time = now.toLocaleTimeString();
 
-        <button id="save-session" onclick="saveSession()">Save Session</button>
-	    <hr>
+        const logEntry = { date, time, goal, activity, independence, comments };
+        logEntries.push(logEntry);
+        localStorage.setItem('logEntries', JSON.stringify(logEntries));
+        renderLog();
+    });
 
-        <div id="session-log">
-            <h2>Session Log</h2>
-            <div id="log-entries"></div>
-        </div>
+    // Render the log in the table
+    function renderLog() {
+        logTableBody.innerHTML = '';
+        logEntries.forEach((entry, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${entry.date}</td>
+                <td>${entry.time}</td>
+                <td>${entry.goal}</td>
+                <td>${entry.activity}</td>
+                <td>${entry.independence}</td>
+                <td>${entry.comments}</td>
+            `;
+            logTableBody.appendChild(row);
+        });
+    }
 
-        <img id="retry" src="retry.png" alt="Try Again" class="full-screen">
-
-        <button id="reset-button" onclick="resetApp()" style="display:none;">Try Again</button>
-        <button id="export-log" onclick="exportLog()">Export All Sessions</button>
-        <button id="clear-log" onclick="clearLog()">Clear Log</button>
-    </div>
-
-    <script>
-        const images = document.querySelectorAll('#image-container img');
-        const retryImg = document.getElementById('retry');
-        const resetButton = document.getElementById('reset-button');
-        const correctActivity = document.getElementById('activity-select');
-        const goalSelect = document.getElementById('goal-select');
-        const independenceSelect = document.getElementById('independence-select');
-        const commentsField = document.getElementById('comments');
-        const logEntries = document.getElementById('log-entries');
-        const log = [];
-        let fullScreenImage = null;
-        let attemptCounter = 0;  // Track number of attempts
-        let lastSelectedId = null;  // Store last selected image to avoid duplicate logging
-
-        const audioElements = {
-            lifeskills: {
-                current: document.getElementById('in_lifeskills'),
-                next: document.getElementById('next_lifeskills')
-            },
-            math: {
-                current: document.getElementById('in_math'),
-                next: document.getElementById('next_math')
-            },
-            english: {
-                current: document.getElementById('in_english'),
-                next: document.getElementById('next_english')
-            },
-            science: {
-                current: document.getElementById('in_science'),
-                next: document.getElementById('next_science')
-            },
-            physed: {
-                current: document.getElementById('in_physed'),
-                next: document.getElementById('next_physed')
-            },
-            health: {
-                current: document.getElementById('in_health'),
-                next: document.getElementById('next_health')
-            },
-            bus: {
-                current: document.getElementById('in_bus'),
-                next: document.getElementById('next_bus')
-            },
-            tryAgain: document.getElementById('retry')
-        };
-
-        images.forEach(image => {
-            image.addEventListener('click', function() {
-                checkSelection(this.id);
-            });
+    // Export to CSV
+    document.getElementById('export-csv').addEventListener('click', function () {
+        let csvContent = "data:text/csv;charset=utf-8,Date,Time,Goal,Activity,Independence,Comments\n";
+        logEntries.forEach(entry => {
+            csvContent += `${entry.date},${entry.time},${entry.goal},${entry.activity},${entry.independence},${entry.comments}\n`;
         });
 
-        function checkSelection(selectedId) {
-            // Avoid duplicate log when the same image is selected consecutively
-            if (selectedId === lastSelectedId) return;
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'IEP_Visual_Schedule_Log.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
 
-            lastSelectedId = selectedId;
-            attemptCounter++;
+    // Export to TXT
+    document.getElementById('export-txt').addEventListener('click', function () {
+        let txtContent = "IEP Visual Schedule Log\n\n";
+        logEntries.forEach(entry => {
+            txtContent += `Date: ${entry.date}\nTime: ${entry.time}\nGoal: ${entry.goal}\nActivity: ${entry.activity}\nIndependence: ${entry.independence}\nComments: ${entry.comments}\n\n`;
+        });
 
-            const correctId = correctActivity.value;
-            const independence = independenceSelect.value;
-            const goal = goalSelect.value;
-            const comments = commentsField.value.trim();  // Ensure we grab comments properly
-            
-            // Push all the data into the log, including the comments
-            const logEntry = {
-                time: new Date().toLocaleString(),
-                attempt: attemptCounter,  // Track the number of attempts
-                studentResponse: selectedId,
-                correctActivity: correctId,
-                independence: independence,
-                goal: goal,
-                comments: comments || 'None', // Handle if comments are left blank
-                result: selectedId === correctId ? 'Correct' : 'Incorrect'
-            };
+        const blob = new Blob([txtContent], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'IEP_Visual_Schedule_Log.txt';
+        link.click();
+    });
 
-            log.push(logEntry);
-
-            if (selectedId === correctId) {
-                playAudio(selectedId, goal); // Play the correct audio
-                expandImage(document.getElementById(selectedId));
-            } else {
-                playAudio('tryAgain'); // Play "Try again" audio
-                showRetryScreen();
-            }
+    // Clear log
+    document.getElementById('clear-log').addEventListener('click', function () {
+        if (confirm('Are you sure you want to clear the log?')) {
+            logEntries = [];
+            localStorage.setItem('logEntries', JSON.stringify(logEntries));
+            renderLog();
         }
+    });
 
-        function playAudio(activity, goalType) {
-            // Pause all audio elements before playing the correct one
-            Object.values(audioElements).forEach(item => {
-                Object.values(item).forEach(audio => audio.pause());
-            });
-
-            if (activity === 'tryAgain') {
-                audioElements.tryAgain.play();
-            } else {
-                // Play the correct audio based on the goal type (current/next)
-                audioElements[activity][goalType.includes("goal1") ? 'current' : 'next'].play();
-            }
-        }
-
-        function expandImage(image) {
-            fullScreenImage = image;
-            image.classList.add('full-screen');
-            image.addEventListener('click', resetApp); // Return to main screen by tapping the image
-        }
-
-        function showRetryScreen() {
-            retryImg.style.display = 'block';
-            retryImg.classList.add('full-screen');
-            retryImg.addEventListener('click', resetApp); // Return to main screen by tapping the retry image
-        }
-
-        function resetApp() {
-            if (fullScreenImage) {
-                fullScreenImage.classList.remove('full-screen');
-                fullScreenImage.removeEventListener('click', resetApp);
-            }
-            retryImg.style.display = 'none';
-            retryImg.classList.remove('full-screen');
-            retryImg.removeEventListener('click', resetApp);
-            fullScreenImage = null;
-        }
-
-        function saveSession() {
-            const correctId = correctActivity.value;
-            const goal = goalSelect.value;
-            const independence = independenceSelect.value;
-            const comments = commentsField.value.trim();
-
-            const logEntryHtml = `
-                <div class="session-entry">
-                    <strong>Attempt #:</strong> ${attemptCounter}<br>
-                    <strong>Time:</strong> ${new Date().toLocaleString()}<br>
-                    <strong>Student's Response:</strong> ${correctId}<br>
-                    <strong>Goal:</strong> ${goal}<br>
-                    <strong>Independence:</strong> ${independence}<br>
-                    <strong>Comments:</strong> ${comments || 'None'}<br>
-                    <strong>Result:</strong> ${correctId === correctActivity.value ? 'Correct' : 'Incorrect'}
-                </div>
-            `;
-            logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
-            commentsField.value = ''; // Clear comments after saving
-        }
-
-        function exportLog() {
-            let csvContent = "Attempt #,Date and Time,Student's Response,Correct Activity,Goal,Independence,Comments,Result\n";
-            log.forEach(entry => {
-                // Ensure that the comments field is added correctly
-                csvContent += `${entry.attempt},"${entry.time}",${entry.studentResponse},${entry.correctActivity},${entry.goal},${entry.independence},"${entry.comments}",${entry.result}\n`;
-            });
-
-            const now = new Date();
-            const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", `IEP_Goal_Tracking_Log_${dateString}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link); // Clean up the link after the download
-        }
-
-        function clearLog() {
-            logEntries.innerHTML = '';
-            log.length = 0; // Clear the array
-            attemptCounter = 0; // Reset attempt counter
-            lastSelectedId = null; // Clear last selected image
-        }
-    </script>
+    // Load log on page load
+    renderLog();
+</script>
 
 </body>
 </html>
