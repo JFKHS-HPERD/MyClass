@@ -105,55 +105,38 @@
         <h1>Hello!
     <br> "What class are you in now? and "What class do you have next?"</h1>
 
-	<!-- Question Selection Dropdown -->
-	  
-        <label for="question-select">(Teacher) Select Question:</label>
-        <select id="question-select">
-            <option value="current">What class are you in now?</option>
-            <option value="next">What class do you have next?</option>
-        </select>    
-	    
-        <label for="activity-select">(Teacher) Choose the correct class:</label>
-        <select id="activity-select">
-        <option value="lifeskills">Lifeskills</option>
-		<option value="math">Math</option>
-		<option value="english">English</option>
-		<option value="science">Science</option>
-		<option value="physed">Phys Ed</option>
-		<option value="health">Health</option>
-		<option value="bus">Bus</option>
-		
-    </select>
-
-        
-	    <p>
-		<b>Objective 1:</b> The student will independently identify his/her upcoming classes during daily routines. He/She will respond to the question "What class are you in now? with 100% accuracy with fading prompts in 4 consecutive trials for each class.
-	<br><br>
-		<b>Objective 1:</b> The student will independently identify his/her upcoming classes during daily routines. He/She will respond to the question "What class do you have next?" with 100% accuracy with fading prompts in 4 consecutive trials for each class.
-	</p>
 	    <label for="goal-select">(Teacher) Select objective for Annual Goal #1:</label>
         <select id="goal-select">
             <option value="goal1">Objective 1: What class are you in now?</option>
             <option value="goal2">Objective 2: What class do you have next?"</option>
         </select>
 
-	    <p>
-		    Have the student select from the icons below.
-	    </p>
-	    <hr>
-        
-	<!-- Class Icons -->
-        <div id="image-container">
-        <img src="lifeskills.png" alt="Lifeskills" id="lifeskills">
-		<img src="math.png" alt="Math" id="math">
-		<img src="english.png" alt="English" id="english">
-		<img src="science.png" alt="Science" id="science">
-		<img src="physed.png" alt="Phys Ed" id="physed">
-		<img src="health.png" alt="Health" id="health">
-		<img src="bus.png" alt="Bus" id="bus">
-    </div>
+	    <label for="activity-select">(Teacher) Choose the correct class:</label>
+        <select id="activity-select">
+            <option value="lifeskills">Lifeskills</option>
+            <option value="math">Math</option>
+            <option value="english">English</option>
+            <option value="science">Science</option>
+            <option value="physed">Phys Ed</option>
+            <option value="health">Health</option>
+            <option value="bus">Bus</option>
+        </select>
 
-	<!-- Audio Elements for "I am in [subject]" -->
+	    <p>Have the student select from the icons below.</p>
+	    <hr>
+
+        <!-- Class Icons -->
+        <div id="image-container">
+            <img src="lifeskills.png" alt="Lifeskills" id="lifeskills">
+            <img src="math.png" alt="Math" id="math">
+            <img src="english.png" alt="English" id="english">
+            <img src="science.png" alt="Science" id="science">
+            <img src="physed.png" alt="Phys Ed" id="physed">
+            <img src="health.png" alt="Health" id="health">
+            <img src="bus.png" alt="Bus" id="bus">
+        </div>
+
+        <!-- Audio Elements for "I am in [subject]" -->
         <audio id="in_lifeskills" src="in_lifeskills.mp3"></audio>
         <audio id="in_math" src="in_math.mp3"></audio>
         <audio id="in_english" src="in_english.mp3"></audio>
@@ -174,21 +157,20 @@
         <!-- Audio Elements for "Try again" -->
         <audio id="retry" src="retry.mp3"></audio>
 
-	<hr>
-	
-	<label for="independence-select">(Teacher) Did the student act independently?</label>
+	    <hr>
+
+	    <label for="independence-select">(Teacher) Did the student act independently?</label>
         <select id="independence-select">
             <option value="yes">Yes</option>
             <option value="no">No</option>
         </select>
-    
+
         <label for="comments">Teacher Comments:</label>
         <textarea id="comments" placeholder="Add any notes or comments..."></textarea>
 
         <button id="save-session" onclick="saveSession()">Save Session</button>
-	    
-	<hr>
-	
+	    <hr>
+
         <div id="session-log">
             <h2>Session Log</h2>
             <div id="log-entries"></div>
@@ -206,7 +188,6 @@
         const retryImg = document.getElementById('retry');
         const resetButton = document.getElementById('reset-button');
         const correctActivity = document.getElementById('activity-select');
-        const questionSelect = document.getElementById('question-select');
         const goalSelect = document.getElementById('goal-select');
         const independenceSelect = document.getElementById('independence-select');
         const commentsField = document.getElementById('comments');
@@ -251,9 +232,8 @@
             });
         });
 
-                function checkSelection(selectedId) {
+        function checkSelection(selectedId) {
             const correctId = correctActivity.value;
-            const selectedQuestion = questionSelect.value;
             const independence = independenceSelect.value;
             const goal = goalSelect.value;
             const comments = commentsField.value.trim();
@@ -271,7 +251,7 @@
             log.push(logEntry);
 
             if (selectedId === correctId) {
-                playAudio(selectedId, selectedQuestion); // Play the correct audio
+                playAudio(selectedId, goal); // Play the correct audio
                 expandImage(document.getElementById(selectedId));
             } else {
                 playAudio('tryAgain'); // Play "Try again" audio
@@ -279,8 +259,7 @@
             }
         }
 
-
-        function playAudio(activity, questionType) {
+        function playAudio(activity, goalType) {
             // Pause all audio elements before playing the correct one
             Object.values(audioElements).forEach(item => {
                 Object.values(item).forEach(audio => audio.pause());
@@ -289,8 +268,8 @@
             if (activity === 'tryAgain') {
                 audioElements.tryAgain.play();
             } else {
-                // Play the correct audio based on the question type (current/next)
-                audioElements[activity][questionType].play();
+                // Play the correct audio based on the goal type (current/next)
+                audioElements[activity][goalType.includes("goal1") ? 'current' : 'next'].play();
             }
         }
 
@@ -306,43 +285,37 @@
             retryImg.addEventListener('click', resetApp); // Return to main screen by tapping the retry image
         }
 
+        function resetApp() {
+            if (fullScreenImage) {
+                fullScreenImage.classList.remove('full-screen');
+                fullScreenImage.removeEventListener('click', resetApp);
+            }
+            retryImg.style.display = 'none';
+            retryImg.classList.remove('full-screen');
+            retryImg.removeEventListener('click', resetApp);
+            resetButton.style.display = 'none';
+            fullScreenImage = null;
+        }
+
         function saveSession() {
-    const correctId = correctActivity.value; // Dropdown selected activity
-    const goal = goalSelect.value;
-    const independence = independenceSelect.value;
-    const comments = commentsField.value.trim();
-    
-    // Use the last selected image for real-time comparison
-    const selectedActivity = log[log.length - 1] ? log[log.length - 1].selectedActivity : correctId;
-    
-    const result = selectedActivity === correctId ? 'Correct' : 'Incorrect'; // Check if the selected image matches
+            const correctId = correctActivity.value;
+            const goal = goalSelect.value;
+            const independence = independenceSelect.value;
+            const comments = commentsField.value.trim();
 
-    const logEntryHtml = `
-        <div class="session-entry">
-            <strong>Time:</strong> ${new Date().toLocaleString()}<br>
-            <strong>Selected Activity:</strong> ${selectedActivity}<br>
-            <strong>Objective:</strong> ${goal}<br>
-            <strong>Independence:</strong> ${independence}<br>
-            <strong>Comments:</strong> ${comments || 'None'}<br>
-            <strong>Result:</strong> ${result}
-        </div>
-    `;
-    logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
-    commentsField.value = ''; // Clear comments after saving
-}
-
-function resetApp() {
-    if (fullScreenImage) {
-        fullScreenImage.classList.remove('full-screen');
-        fullScreenImage.removeEventListener('click', resetApp);
-    }
-    retryImg.style.display = 'none';
-    retryImg.classList.remove('full-screen');
-    retryImg.removeEventListener('click', resetApp);
-    fullScreenImage = null;
-}
-
-
+            const logEntryHtml = `
+                <div class="session-entry">
+                    <strong>Time:</strong> ${new Date().toLocaleString()}<br>
+                    <strong>Selected Activity:</strong> ${correctId}<br>
+                    <strong>Goal:</strong> ${goal}<br>
+                    <strong>Independence:</strong> ${independence}<br>
+                    <strong>Comments:</strong> ${comments || 'None'}<br>
+                    <strong>Result:</strong> ${correctId === correctActivity.value ? 'Correct' : 'Incorrect'}
+                </div>
+            `;
+            logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
+            commentsField.value = ''; // Clear comments after saving
+        }
 
         function exportLog() {
             let logContent = "IEP Goal Tracking Log\n";
@@ -359,7 +332,7 @@ function resetApp() {
             link.href = URL.createObjectURL(blob);
             link.download = `IEP_Goal_Tracking_Log_${dateString}.txt`;
             link.click();
-      }
+        }
 
         function clearLog() {
             logEntries.innerHTML = '';
