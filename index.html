@@ -328,19 +328,21 @@
         }
 
         function exportLog() {
-            let logContent = "IEP Goal Tracking Log\n";
-            logContent += "Attempt #, Date and Time, Student's Response, Correct Activity, Goal, Independence, Comments, Result\n";
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Attempt #,Date and Time,Student's Response,Correct Activity,Goal,Independence,Comments,Result\n";
             log.forEach(entry => {
-                logContent += `${entry.attempt}, ${entry.time}, ${entry.studentResponse}, ${entry.correctActivity}, ${entry.goal}, ${entry.independence}, ${entry.comments || 'None'}, ${entry.result}\n`;
+                csvContent += `${entry.attempt},${entry.time},${entry.studentResponse},${entry.correctActivity},${entry.goal},${entry.independence},${entry.comments || 'None'},${entry.result}\n`;
             });
 
             const now = new Date();
             const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-            const blob = new Blob([logContent], { type: 'text/plain' });
+            const encodedUri = encodeURI(csvContent);
             const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `IEP_Goal_Tracking_Log_${dateString}.txt`;
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `IEP_Goal_Tracking_Log_${dateString}.csv`);
+            document.body.appendChild(link); // Required for Firefox
+
             link.click();
         }
 
