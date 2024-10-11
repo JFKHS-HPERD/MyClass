@@ -301,12 +301,12 @@
                     <strong>Correct Activity:</strong> ${correctId}<br>
                     <strong>Goal:</strong> ${goal}<br>
                     <strong>Independence:</strong> ${independence}<br>
-                    <strong>Comments:</strong> ${comments || 'None'}<br>
-                    <strong>Result:</strong> ${lastSelectedId === correctId ? 'Correct' : 'Incorrect'}
+                    <strong>Comments:</strong> ${comments || 'None'}
                 </div>
             `;
             logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
-            commentsField.value = ''; // Clear comments after saving
+            attemptCounter = 0;  // Reset attempt counter after session is saved
+            commentsField.value = '';  // Clear comments after saving
         }
 
         function exportLog() {
