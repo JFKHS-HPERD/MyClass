@@ -192,9 +192,9 @@
         const independenceSelect = document.getElementById('independence-select');
         const commentsField = document.getElementById('comments');
         const logEntries = document.getElementById('log-entries');
-        const log = [];
-        let attemptCounter = 0;
-        let lastSelectedId = null;
+        const log = [];  // Only save data when "Save Session" is clicked
+        let attemptCounter = 0;  // Track number of attempts
+        let lastSelectedId = null;  // Store last selected image to avoid duplicate logging
 
         const audioElements = {
             lifeskills: {
@@ -298,7 +298,6 @@
                 <div class="session-entry">
                     <strong>Number of Attempts:</strong> ${attemptCounter}<br>
                     <strong>Time:</strong> ${new Date().toLocaleString()}<br>
-                    <strong>Student's Response:</strong> ${lastSelectedId}<br>
                     <strong>Correct Activity:</strong> ${correctId}<br>
                     <strong>Goal:</strong> ${goal}<br>
                     <strong>Independence:</strong> ${independence}<br>
@@ -311,9 +310,10 @@
         }
 
         function exportLog() {
-            let csvContent = "Number of Attempts,Date and Time,Student's Response,Correct Activity,Goal,Independence,Comments,Result\n";
-            log.forEach(entry => {
-                csvContent += `${entry.attempt},"${entry.time}",${entry.studentResponse},${entry.correctActivity},${entry.goal},${entry.independence},"${entry.comments}",${entry.result}\n`;
+            let csvContent = "Number of Attempts,Date and Time,Correct Activity,Goal,Independence,Comments,Result\n";
+            logEntries.querySelectorAll('.session-entry').forEach(entry => {
+                const textContent = entry.textContent.trim().replace(/\n/g, ',');
+                csvContent += textContent + '\n';
             });
 
             const now = new Date();
