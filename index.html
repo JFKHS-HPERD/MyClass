@@ -192,8 +192,6 @@
         const independenceSelect = document.getElementById('independence-select');
         const commentsField = document.getElementById('comments');
         const logEntries = document.getElementById('log-entries');
-        const log = [];
-        let fullScreenImage = null;
         let attemptCounter = 0;  // Track number of attempts
         let lastSelectedId = null;  // Store last selected image to avoid duplicate logging
 
@@ -247,19 +245,21 @@
             const goal = goalSelect.value;
             const comments = commentsField.value.trim();  // Ensure we grab comments properly
             
-            // Push all the data into the log, including the comments
-            const logEntry = {
-                time: new Date().toLocaleString(),
-                attempt: attemptCounter,  // Track the number of attempts
-                studentResponse: selectedId,
-                correctActivity: correctId,
-                independence: independence,
-                goal: goal,
-                comments: comments || 'None', // Handle if comments are left blank
-                result: selectedId === correctId ? 'Correct' : 'Incorrect'
-            };
-
-            log.push(logEntry);
+            // Save data into the session log as displayed on the screen
+            const logEntryHtml = `
+                <div class="session-entry">
+                    <strong>Number of Attempts:</strong> ${attemptCounter}<br>
+                    <strong>Time:</strong> ${new Date().toLocaleString()}<br>
+                    <strong>Student's Response:</strong> ${selectedId}<br>
+                    <strong>Correct Activity:</strong> ${correctId}<br>
+                    <strong>Goal:</strong> ${goal}<br>
+                    <strong>Independence:</strong> ${independence}<br>
+                    <strong>Comments:</strong> ${comments || 'None'}<br>
+                    <strong>Result:</strong> ${selectedId === correctId ? 'Correct' : 'Incorrect'}
+                </div>
+            `;
+            logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
+            commentsField.value = ''; // Clear comments after saving
 
             if (selectedId === correctId) {
                 playAudio(selectedId, goal); // Play the correct audio
@@ -307,38 +307,16 @@
             fullScreenImage = null;
         }
 
-        function saveSession() {
-            const correctId = correctActivity.value;
-            const goal = goalSelect.value;
-            const independence = independenceSelect.value;
-            const comments = commentsField.value.trim();
-
-            const logEntryHtml = `
-                <div class="session-entry">
-                    <strong>Number of Attempts:</strong> ${attemptCounter}<br>
-                    <strong>Time:</strong> ${new Date().toLocaleString()}<br>
-                    <strong>Student's Response:</strong> ${correctId}<br>
-                    <strong>Goal:</strong> ${goal}<br>
-                    <strong>Independence:</strong> ${independence}<br>
-                    <strong>Comments:</strong> ${comments || 'None'}<br>
-                    <strong>Result:</strong> ${correctId === correctActivity.value ? 'Correct' : 'Incorrect'}
-                </div>
-            `;
-            logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
-            commentsField.value = ''; // Clear comments after saving
-        }
-
         function exportLog() {
-            let csvContent = "Number of Attempts,Date and Time,Student's Response,Correct Activity,Goal,Independence,Comments,Result\n";
-            log.forEach(entry => {
-                // Ensure that the comments field is added correctly
-                csvContent += `${entry.attempt},"${entry.time}",${entry.studentResponse},${entry.correctActivity},${entry.goal},${entry.independence},"${entry.comments}",${entry.result}\n`;
+            let logContent = "Number of Attempts,Date and Time,Student's Response,Correct Activity,Goal,Independence,Comments,Result\n";
+            document.querySelectorAll('.session-entry').forEach(entry => {
+                logContent += entry.innerText.replace(/\n/g, ', ') + '\n';
             });
 
             const now = new Date();
             const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([logContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
@@ -350,7 +328,6 @@
 
         function clearLog() {
             logEntries.innerHTML = '';
-            log.length = 0; // Clear the array
             attemptCounter = 0; // Reset attempt counter
             lastSelectedId = null; // Clear last selected image
         }
