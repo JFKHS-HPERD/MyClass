@@ -310,20 +310,20 @@
         }
 
         function exportLog() {
-            let csvContent = "Number of Attempts,Date and Time,Correct Activity,Goal,Independence,Comments,Result\n";
+            let logText = '';
             logEntries.querySelectorAll('.session-entry').forEach(entry => {
-                const textContent = entry.textContent.trim().replace(/\n\s+/g, ', ');
-                csvContent += textContent + '\n';
+                const textContent = entry.textContent.trim();
+                logText += textContent + '\n\n';  // Add new lines between entries for readability
             });
 
             const now = new Date();
             const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([logText], { type: 'text/plain;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
-            link.setAttribute("download", `IEP_Goal_Tracking_Log_${dateString}.csv`);
+            link.setAttribute("download", `IEP_Goal_Tracking_Log_${dateString}.txt`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);  // Clean up the link after the download
@@ -331,7 +331,6 @@
 
         function clearLog() {
             logEntries.innerHTML = '';
-            log.length = 0;  // Clear the array
             attemptCounter = 0;  // Reset attempt counter
             lastSelectedId = null;  // Clear last selected image
         }
