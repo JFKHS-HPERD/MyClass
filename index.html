@@ -102,15 +102,16 @@
 <body>
 
     <div class="container">
-        <h1>Hello!<br> "What class are you in now? and "What class do you have next?"</h1>
+        <h1>Hello!
+    <br> "What class are you in now? and "What class do you have next?"</h1>
 
-        <label for="goal-select">(Teacher) Select objective for Annual Goal #1:</label>
+	    <label for="goal-select">(Teacher) Select objective for Annual Goal #1:</label>
         <select id="goal-select">
             <option value="goal1">Objective 1: What class are you in now?</option>
             <option value="goal2">Objective 2: What class do you have next?"</option>
         </select>
 
-        <label for="activity-select">(Teacher) Choose the correct class:</label>
+	    <label for="activity-select">(Teacher) Choose the correct class:</label>
         <select id="activity-select">
             <option value="lifeskills">Lifeskills</option>
             <option value="math">Math</option>
@@ -121,8 +122,8 @@
             <option value="bus">Bus</option>
         </select>
 
-        <p>Have the student select from the icons below.</p>
-        <hr>
+	    <p>Have the student select from the icons below.</p>
+	    <hr>
 
         <!-- Class Icons -->
         <div id="image-container">
@@ -156,9 +157,9 @@
         <!-- Audio Elements for "Try again" -->
         <audio id="retry" src="retry.mp3"></audio>
 
-        <hr>
+	    <hr>
 
-        <label for="independence-select">(Teacher) Did the student act independently?</label>
+	    <label for="independence-select">(Teacher) Did the student act independently?</label>
         <select id="independence-select">
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -168,7 +169,7 @@
         <textarea id="comments" placeholder="Add any notes or comments..."></textarea>
 
         <button id="save-session" onclick="saveSession()">Save Session</button>
-        <hr>
+	    <hr>
 
         <div id="session-log">
             <h2>Session Log</h2>
@@ -191,7 +192,8 @@
         const independenceSelect = document.getElementById('independence-select');
         const commentsField = document.getElementById('comments');
         const logEntries = document.getElementById('log-entries');
-        let log = [];
+        const log = [];
+        let fullScreenImage = null;
         let attemptCounter = 0;  // Track number of attempts
         let lastSelectedId = null;  // Store last selected image to avoid duplicate logging
 
@@ -259,21 +261,6 @@
 
             log.push(logEntry);
 
-            // Save the log to the session log on the page
-            const logEntryHtml = `
-                <div class="session-entry">
-                    <strong>Number of Attempts:</strong> ${attemptCounter}<br>
-                    <strong>Time:</strong> ${new Date().toLocaleString()}<br>
-                    <strong>Student's Response:</strong> ${selectedId}<br>
-                    <strong>Goal:</strong> ${goal}<br>
-                    <strong>Independence:</strong> ${independence}<br>
-                    <strong>Comments:</strong> ${comments || 'None'}<br>
-                    <strong>Result:</strong> ${selectedId === correctId ? 'Correct' : 'Incorrect'}
-                </div>
-            `;
-            logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
-            commentsField.value = ''; // Clear comments after saving
-
             if (selectedId === correctId) {
                 playAudio(selectedId, goal); // Play the correct audio
                 expandImage(document.getElementById(selectedId));
@@ -320,17 +307,38 @@
             fullScreenImage = null;
         }
 
-        // Export the log from the visible session log
+        function saveSession() {
+            const correctId = correctActivity.value;
+            const goal = goalSelect.value;
+            const independence = independenceSelect.value;
+            const comments = commentsField.value.trim();
+
+            const logEntryHtml = `
+                <div class="session-entry">
+                    <strong>Number of Attempts:</strong> ${attemptCounter}<br>
+                    <strong>Time:</strong> ${new Date().toLocaleString()}<br>
+                    <strong>Student's Response:</strong> ${correctId}<br>
+                    <strong>Goal:</strong> ${goal}<br>
+                    <strong>Independence:</strong> ${independence}<br>
+                    <strong>Comments:</strong> ${comments || 'None'}<br>
+                    <strong>Result:</strong> ${correctId === correctActivity.value ? 'Correct' : 'Incorrect'}
+                </div>
+            `;
+            logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
+            commentsField.value = ''; // Clear comments after saving
+        }
+
         function exportLog() {
-            let logContent = "Number of Attempts, Date and Time, Student's Response, Correct Activity, Goal, Independence, Comments, Result\n";
-            document.querySelectorAll('.session-entry').forEach(entry => {
-                logContent += entry.innerText.replace(/\n/g, ', ') + '\n';
+            let csvContent = "Number of Attempts,Date and Time,Student's Response,Correct Activity,Goal,Independence,Comments,Result\n";
+            log.forEach(entry => {
+                // Ensure that the comments field is added correctly
+                csvContent += `${entry.attempt},"${entry.time}",${entry.studentResponse},${entry.correctActivity},${entry.goal},${entry.independence},"${entry.comments}",${entry.result}\n`;
             });
 
             const now = new Date();
             const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-            const blob = new Blob([logContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
