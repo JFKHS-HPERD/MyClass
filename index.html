@@ -194,6 +194,9 @@
         const logEntries = document.getElementById('log-entries');
         const log = [];
         let fullScreenImage = null;
+        let attemptCounter = 0;  // Track number of attempts
+        let lastSelectedId = null;  // Store last selected image to avoid duplicate logging
+
         const audioElements = {
             lifeskills: {
                 current: document.getElementById('in_lifeskills'),
@@ -233,6 +236,12 @@
         });
 
         function checkSelection(selectedId) {
+            // Avoid duplicate log when the same image is selected consecutively
+            if (selectedId === lastSelectedId) return;
+
+            lastSelectedId = selectedId;
+            attemptCounter++;
+
             const correctId = correctActivity.value;
             const independence = independenceSelect.value;
             const goal = goalSelect.value;
@@ -240,7 +249,8 @@
             
             const logEntry = {
                 time: new Date().toLocaleString(),
-                selectedActivity: selectedId,
+                attempt: attemptCounter,  // Track the number of attempts
+                studentResponse: selectedId,
                 correctActivity: correctId,
                 independence: independence,
                 goal: goal,
@@ -293,7 +303,6 @@
             retryImg.style.display = 'none';
             retryImg.classList.remove('full-screen');
             retryImg.removeEventListener('click', resetApp);
-            resetButton.style.display = 'none';
             fullScreenImage = null;
         }
 
@@ -305,8 +314,9 @@
 
             const logEntryHtml = `
                 <div class="session-entry">
+                    <strong>Attempt #:</strong> ${attemptCounter}<br>
                     <strong>Time:</strong> ${new Date().toLocaleString()}<br>
-                    <strong>Selected Activity:</strong> ${correctId}<br>
+                    <strong>Student's Response:</strong> ${correctId}<br>
                     <strong>Goal:</strong> ${goal}<br>
                     <strong>Independence:</strong> ${independence}<br>
                     <strong>Comments:</strong> ${comments || 'None'}<br>
@@ -319,9 +329,9 @@
 
         function exportLog() {
             let logContent = "IEP Goal Tracking Log\n";
-            logContent += "Date and Time, Selected Activity, Correct Activity, Goal, Independence, Comments, Result\n";
+            logContent += "Attempt #, Date and Time, Student's Response, Correct Activity, Goal, Independence, Comments, Result\n";
             log.forEach(entry => {
-                logContent += `${entry.time}, ${entry.selectedActivity}, ${entry.correctActivity}, ${entry.goal}, ${entry.independence}, ${entry.comments || 'None'}, ${entry.result}\n`;
+                logContent += `${entry.attempt}, ${entry.time}, ${entry.studentResponse}, ${entry.correctActivity}, ${entry.goal}, ${entry.independence}, ${entry.comments || 'None'}, ${entry.result}\n`;
             });
 
             const now = new Date();
@@ -337,6 +347,8 @@
         function clearLog() {
             logEntries.innerHTML = '';
             log.length = 0; // Clear the array
+            attemptCounter = 0; // Reset attempt counter
+            lastSelectedId = null; // Clear last selected image
         }
     </script>
 
