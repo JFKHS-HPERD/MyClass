@@ -124,10 +124,10 @@
 		
     </select>
 
-        <label for="goal-select">(Teacher) Select Annual Goal:</label>
+        <label for="goal-select">(Teacher) Select objective for Annual Goal #1:</label>
         <select id="goal-select">
-            <option value="goal1">Annual Goal #1</option>
-            <option value="goal2">Annual Goal #2</option>
+            <option value="goal1">Objective 1</option>
+            <option value="goal2">Objective 2</option>
         </select>
 
         <label for="independence-select">(Teacher) Did the student act independently?</label>
@@ -317,7 +317,7 @@
         <div class="session-entry">
             <strong>Time:</strong> ${new Date().toLocaleString()}<br>
             <strong>Selected Activity:</strong> ${selectedActivity}<br>
-            <strong>Goal:</strong> ${goal}<br>
+            <strong>Objective:</strong> ${goal}<br>
             <strong>Independence:</strong> ${independence}<br>
             <strong>Comments:</strong> ${comments || 'None'}<br>
             <strong>Result:</strong> ${result}
