@@ -245,8 +245,9 @@
             const correctId = correctActivity.value;
             const independence = independenceSelect.value;
             const goal = goalSelect.value;
-            const comments = commentsField.value.trim();
+            const comments = commentsField.value.trim();  // Ensure we grab comments properly
             
+            // Push all the data into the log, including the comments
             const logEntry = {
                 time: new Date().toLocaleString(),
                 attempt: attemptCounter,  // Track the number of attempts
@@ -254,7 +255,7 @@
                 correctActivity: correctId,
                 independence: independence,
                 goal: goal,
-                comments: comments,
+                comments: comments || 'None', // Handle if comments are left blank
                 result: selectedId === correctId ? 'Correct' : 'Incorrect'
             };
 
@@ -330,7 +331,8 @@
         function exportLog() {
             let csvContent = "Attempt #,Date and Time,Student's Response,Correct Activity,Goal,Independence,Comments,Result\n";
             log.forEach(entry => {
-                csvContent += `${entry.attempt},"${entry.time}",${entry.studentResponse},${entry.correctActivity},${entry.goal},${entry.independence},"${entry.comments || 'None'}",${entry.result}\n`;
+                // Ensure that the comments field is added correctly
+                csvContent += `${entry.attempt},"${entry.time}",${entry.studentResponse},${entry.correctActivity},${entry.goal},${entry.independence},"${entry.comments}",${entry.result}\n`;
             });
 
             const now = new Date();
