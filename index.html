@@ -312,7 +312,7 @@
         function exportLog() {
             let csvContent = "Number of Attempts,Date and Time,Correct Activity,Goal,Independence,Comments,Result\n";
             logEntries.querySelectorAll('.session-entry').forEach(entry => {
-                const textContent = entry.textContent.trim().replace(/\n/g, ',');
+                const textContent = entry.textContent.trim().replace(/\n\s+/g, ',');
                 csvContent += textContent + '\n';
             });
 
