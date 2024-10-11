@@ -330,7 +330,7 @@
         function exportLog() {
             let csvContent = "Attempt #,Date and Time,Student's Response,Correct Activity,Goal,Independence,Comments,Result\n";
             log.forEach(entry => {
-                csvContent += `${entry.attempt},${entry.time},${entry.studentResponse},${entry.correctActivity},${entry.goal},${entry.independence},${entry.comments || 'None'},${entry.result}\n`;
+                csvContent += `${entry.attempt},"${entry.time}",${entry.studentResponse},${entry.correctActivity},${entry.goal},${entry.independence},"${entry.comments || 'None'}",${entry.result}\n`;
             });
 
             const now = new Date();
