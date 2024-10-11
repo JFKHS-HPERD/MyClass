@@ -191,8 +191,7 @@
         const independenceSelect = document.getElementById('independence-select');
         const commentsField = document.getElementById('comments');
         const logEntries = document.getElementById('log-entries');
-        const log = [];
-        let fullScreenImage = null;
+        let log = [];
         let attemptCounter = 0;  // Track number of attempts
         let lastSelectedId = null;  // Store last selected image to avoid duplicate logging
 
@@ -260,6 +259,21 @@
 
             log.push(logEntry);
 
+            // Save the log to the session log on the page
+            const logEntryHtml = `
+                <div class="session-entry">
+                    <strong>Number of Attempts:</strong> ${attemptCounter}<br>
+                    <strong>Time:</strong> ${new Date().toLocaleString()}<br>
+                    <strong>Student's Response:</strong> ${selectedId}<br>
+                    <strong>Goal:</strong> ${goal}<br>
+                    <strong>Independence:</strong> ${independence}<br>
+                    <strong>Comments:</strong> ${comments || 'None'}<br>
+                    <strong>Result:</strong> ${selectedId === correctId ? 'Correct' : 'Incorrect'}
+                </div>
+            `;
+            logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
+            commentsField.value = ''; // Clear comments after saving
+
             if (selectedId === correctId) {
                 playAudio(selectedId, goal); // Play the correct audio
                 expandImage(document.getElementById(selectedId));
@@ -306,38 +320,17 @@
             fullScreenImage = null;
         }
 
-        function saveSession() {
-            const correctId = correctActivity.value;
-            const goal = goalSelect.value;
-            const independence = independenceSelect.value;
-            const comments = commentsField.value.trim();
-
-            const logEntryHtml = `
-                <div class="session-entry">
-                    <strong>Number of Attempts:</strong> ${attemptCounter}<br>
-                    <strong>Time:</strong> ${new Date().toLocaleString()}<br>
-                    <strong>Student's Response:</strong> ${correctId}<br>
-                    <strong>Goal:</strong> ${goal}<br>
-                    <strong>Independence:</strong> ${independence}<br>
-                    <strong>Comments:</strong> ${comments || 'None'}<br>
-                    <strong>Result:</strong> ${correctId === correctActivity.value ? 'Correct' : 'Incorrect'}
-                </div>
-            `;
-            logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
-            commentsField.value = ''; // Clear comments after saving
-        }
-
+        // Export the log from the visible session log
         function exportLog() {
-            let csvContent = "Number of Attempts,Date and Time,Student's Response,Correct Activity,Goal,Independence,Comments,Result\n";
-            log.forEach(entry => {
-                // Ensure that the comments field is added correctly
-                csvContent += `${entry.attempt},"${entry.time}",${entry.studentResponse},${entry.correctActivity},${entry.goal},${entry.independence},"${entry.comments}",${entry.result}\n`;
+            let logContent = "Number of Attempts, Date and Time, Student's Response, Correct Activity, Goal, Independence, Comments, Result\n";
+            document.querySelectorAll('.session-entry').forEach(entry => {
+                logContent += entry.innerText.replace(/\n/g, ', ') + '\n';
             });
 
             const now = new Date();
             const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([logContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
