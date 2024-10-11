@@ -192,7 +192,8 @@
         const independenceSelect = document.getElementById('independence-select');
         const commentsField = document.getElementById('comments');
         const logEntries = document.getElementById('log-entries');
-        const log = [];  // Only save data when "Save Session" is clicked
+        const log = [];
+        let fullScreenImage = null;
         let attemptCounter = 0;  // Track number of attempts
         let lastSelectedId = null;  // Store last selected image to avoid duplicate logging
 
@@ -240,6 +241,33 @@
 
             lastSelectedId = selectedId;
             attemptCounter++;
+
+            const correctId = correctActivity.value;
+            const independence = independenceSelect.value;
+            const goal = goalSelect.value;
+            const comments = commentsField.value.trim();  // Ensure we grab comments properly
+            
+            // Push all the data into the log, including the comments
+            const logEntry = {
+                time: new Date().toLocaleString(),
+                attempt: attemptCounter,  // Track the number of attempts
+                studentResponse: selectedId,
+                correctActivity: correctId,
+                independence: independence,
+                goal: goal,
+                comments: comments || 'None', // Handle if comments are left blank
+                result: selectedId === correctId ? 'Correct' : 'Incorrect'
+            };
+
+            log.push(logEntry);
+
+            if (selectedId === correctId) {
+                playAudio(selectedId, goal); // Play the correct audio
+                expandImage(document.getElementById(selectedId));
+            } else {
+                playAudio('tryAgain'); // Play "Try again" audio
+                showRetryScreen();
+            }
         }
 
         function playAudio(activity, goalType) {
@@ -256,44 +284,54 @@
             }
         }
 
+        function expandImage(image) {
+            fullScreenImage = image;
+            image.classList.add('full-screen');
+            image.addEventListener('click', resetApp); // Return to main screen by tapping the image
+        }
+
+        function showRetryScreen() {
+            retryImg.style.display = 'block';
+            retryImg.classList.add('full-screen');
+            retryImg.addEventListener('click', resetApp); // Return to main screen by tapping the retry image
+        }
+
+        function resetApp() {
+            if (fullScreenImage) {
+                fullScreenImage.classList.remove('full-screen');
+                fullScreenImage.removeEventListener('click', resetApp);
+            }
+            retryImg.style.display = 'none';
+            retryImg.classList.remove('full-screen');
+            retryImg.removeEventListener('click', resetApp);
+            fullScreenImage = null;
+        }
+
         function saveSession() {
             const correctId = correctActivity.value;
             const goal = goalSelect.value;
             const independence = independenceSelect.value;
             const comments = commentsField.value.trim();
 
-            const logEntry = {
-                time: new Date().toLocaleString(),
-                attempt: attemptCounter,
-                studentResponse: lastSelectedId,
-                correctActivity: correctId,
-                goal: goal,
-                independence: independence,
-                comments: comments || 'None',  // Default to 'None' if no comments
-                result: lastSelectedId === correctId ? 'Correct' : 'Incorrect'
-            };
-
-            log.push(logEntry);  // Save the log data only after "Save Session" is clicked
-
             const logEntryHtml = `
                 <div class="session-entry">
-                    <strong>Number of Attempts:</strong> ${logEntry.attempt}<br>
-                    <strong>Time:</strong> ${logEntry.time}<br>
-                    <strong>Student's Response:</strong> ${logEntry.studentResponse}<br>
-                    <strong>Correct Activity:</strong> ${logEntry.correctActivity}<br>
-                    <strong>Goal:</strong> ${logEntry.goal}<br>
-                    <strong>Independence:</strong> ${logEntry.independence}<br>
-                    <strong>Comments:</strong> ${logEntry.comments}<br>
-                    <strong>Result:</strong> ${logEntry.result}
+                    <strong>Number of Attempts:</strong> ${attemptCounter}<br>
+                    <strong>Time:</strong> ${new Date().toLocaleString()}<br>
+                    <strong>Student's Response:</strong> ${correctId}<br>
+                    <strong>Goal:</strong> ${goal}<br>
+                    <strong>Independence:</strong> ${independence}<br>
+                    <strong>Comments:</strong> ${comments || 'None'}<br>
+                    <strong>Result:</strong> ${correctId === correctActivity.value ? 'Correct' : 'Incorrect'}
                 </div>
             `;
             logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
-            commentsField.value = '';  // Clear comments after saving
+            commentsField.value = ''; // Clear comments after saving
         }
 
         function exportLog() {
             let csvContent = "Number of Attempts,Date and Time,Student's Response,Correct Activity,Goal,Independence,Comments,Result\n";
             log.forEach(entry => {
+                // Ensure that the comments field is added correctly
                 csvContent += `${entry.attempt},"${entry.time}",${entry.studentResponse},${entry.correctActivity},${entry.goal},${entry.independence},"${entry.comments}",${entry.result}\n`;
             });
 
@@ -307,14 +345,14 @@
             link.setAttribute("download", `IEP_Goal_Tracking_Log_${dateString}.csv`);
             document.body.appendChild(link);
             link.click();
-            document.body.removeChild(link);  // Clean up the link after the download
+            document.body.removeChild(link); // Clean up the link after the download
         }
 
         function clearLog() {
             logEntries.innerHTML = '';
-            log.length = 0;  // Clear the array
-            attemptCounter = 0;  // Reset attempt counter
-            lastSelectedId = null;  // Clear last selected image
+            log.length = 0; // Clear the array
+            attemptCounter = 0; // Reset attempt counter
+            lastSelectedId = null; // Clear last selected image
         }
     </script>
 
