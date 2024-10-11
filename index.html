@@ -306,30 +306,17 @@
             retryImg.addEventListener('click', resetApp); // Return to main screen by tapping the retry image
         }
 
-        function resetApp() {
-            if (fullScreenImage) {
-                fullScreenImage.classList.remove('full-screen');
-                fullScreenImage.removeEventListener('click', resetApp);
-            }
-            retryImg.style.display = 'none';
-            retryImg.classList.remove('full-screen');
-            retryImg.removeEventListener('click', resetApp);
-            resetButton.style.display = 'none';
-            fullScreenImage = null;
-        }
-
         function saveSession() {
     const correctId = correctActivity.value; // Dropdown selected activity
     const goal = goalSelect.value;
     const independence = independenceSelect.value;
     const comments = commentsField.value.trim();
     
-    // Find the last selected image for comparison
-    const lastLogEntry = log[log.length - 1]; 
-    const selectedActivity = lastLogEntry ? lastLogEntry.selectedActivity : correctId;
+    // Use the last selected image for real-time comparison
+    const selectedActivity = log[log.length - 1] ? log[log.length - 1].selectedActivity : correctId;
     
     const result = selectedActivity === correctId ? 'Correct' : 'Incorrect'; // Check if the selected image matches
-    
+
     const logEntryHtml = `
         <div class="session-entry">
             <strong>Time:</strong> ${new Date().toLocaleString()}<br>
@@ -343,6 +330,18 @@
     logEntries.insertAdjacentHTML('beforeend', logEntryHtml);
     commentsField.value = ''; // Clear comments after saving
 }
+
+function resetApp() {
+    if (fullScreenImage) {
+        fullScreenImage.classList.remove('full-screen');
+        fullScreenImage.removeEventListener('click', resetApp);
+    }
+    retryImg.style.display = 'none';
+    retryImg.classList.remove('full-screen');
+    retryImg.removeEventListener('click', resetApp);
+    fullScreenImage = null;
+}
+
 
 
         function exportLog() {
