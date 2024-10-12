@@ -97,6 +97,15 @@
             padding: 10px;
             border-bottom: 1px solid #ccc;
         }
+        .footer {
+            position: static;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: grey;
+            color: white;
+            text-align: right;
+}
     </style>
 </head>
 <body>
@@ -113,10 +122,10 @@
 	</p>
 
 	    
-	    <label for="goal-select">(Teacher) Select objective for Annual Goal #1:</label>
-        <select id="goal-select">
-            <option value="goal1">Objective 1: What class are you in now?</option>
-            <option value="goal2">Objective 2: What class do you have next?"</option>
+	    <label for="objective-select">(Teacher) Select objective for Annual Goal #1:</label>
+        <select id="objective-select">
+            <option value="objective_1">Objective 1: What class are you in now?</option>
+            <option value="objective_2">Objective 2: What class do you have next?"</option>
         </select>
 
 	    <label for="activity-select">(Teacher) Choose the correct class:</label>
@@ -190,13 +199,24 @@
         <button id="export-log" onclick="exportLog()">Export All Sessions</button>
         <button id="clear-log" onclick="clearLog()">Clear Log</button>
     </div>
-
-    <script>
+    
+ <!-- Footer -->
+    <div class="footer">
+  <p>
+	  Click here to go to
+	  <b><a href="https://jfkhs-hperd.github.io/MyTeacher/">Annual Goal #2</a></b>
+  </p>
+  <p>
+	  &#169; 2024 Lewie Tenorio
+  </p>
+    </div>
+	
+<script>
         const images = document.querySelectorAll('#image-container img');
         const retryImg = document.getElementById('retry');
         const resetButton = document.getElementById('reset-button');
         const correctActivity = document.getElementById('activity-select');
-        const goalSelect = document.getElementById('goal-select');
+        const objectiveSelect = document.getElementById('objective-select');
         const independenceSelect = document.getElementById('independence-select');
         const commentsField = document.getElementById('comments');
         const logEntries = document.getElementById('log-entries');
@@ -250,10 +270,10 @@
             attemptCounter++;
 
             const correctId = correctActivity.value;
-            const goal = goalSelect.value;
+            const objective = objectiveSelect.value;
 
             if (selectedId === correctId) {
-                playAudio(selectedId, goal); // Play the correct audio
+                playAudio(selectedId, objective); // Play the correct audio
                 expandImage(document.getElementById(selectedId));
             } else {
                 playAudio('tryAgain'); // Play "Try again" audio
@@ -261,7 +281,7 @@
             }
         }
 
-        function playAudio(activity, goalType) {
+        function playAudio(activity, objectiveType) {
             // Pause all audio elements before playing the correct one
             Object.values(audioElements).forEach(item => {
                 Object.values(item).forEach(audio => audio.pause());
@@ -270,8 +290,8 @@
             if (activity === 'tryAgain') {
                 audioElements.tryAgain.play();
             } else {
-                // Play the correct audio based on the goal type (current/next)
-                audioElements[activity][goalType.includes("goal1") ? 'current' : 'next'].play();
+                // Play the correct audio based on the objective type (current/next)
+                audioElements[activity][objectiveType.includes("objective_1") ? 'current' : 'next'].play();
             }
         }
 
@@ -298,7 +318,7 @@
 
         function saveSession() {
             const correctId = correctActivity.value;
-            const goal = goalSelect.value;
+            const objective = objectiveSelect.value;
             const independence = independenceSelect.value;
             const comments = commentsField.value.trim();
 
@@ -307,7 +327,7 @@
                     <strong>Number of Attempts:</strong> ${attemptCounter}<br>
                     <strong>Time:</strong> ${new Date().toLocaleString()}<br>
                     <strong>Correct Activity:</strong> ${correctId}<br>
-                    <strong>Goal:</strong> ${goal}<br>
+                    <strong>Objective:</strong> ${objective}<br>
                     <strong>Independence:</strong> ${independence}<br>
                     <strong>Comments:</strong> ${comments || 'None'}
                 </div>
